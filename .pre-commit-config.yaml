@@ -1,0 +1,28 @@
+repos:
+#    basic black check
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+    -   id: black
+
+#     pylint check
+-   repo: https://github.com/pycqa/pylint
+    rev: v3.3.0
+    hooks:
+    -   id: pylint
+
+
+
+- repo: local
+  hooks:
+    - id: commit-msg-pattern
+      name: Commit message must include DJ-XXXXXX pattern
+      entry: bash ./check-commit-message.sh
+      language: system
+      stages: [commit-msg]
