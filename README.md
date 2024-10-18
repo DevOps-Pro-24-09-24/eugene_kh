@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Pre-commit Hooks:
 
 # Home Word 1 - Add Pre-Commit Hooks
@@ -18,3 +19,7 @@
 pip install pre-commit ruff
 Initialize pre-commit on your repository: (pre-commit install)
 ```
+=======
+# Eugene Kholodnyak
+## homeworks
+>>>>>>> 12f0ec4e07bfe49e431da4af1b7bf03eef909746
