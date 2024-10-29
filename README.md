@@ -1,5 +1,5 @@
 
-# Home Word 1
+# Home Work 1
 
 # Add Pre-Commit Hooks
 
