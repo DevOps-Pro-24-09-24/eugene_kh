@@ -18,7 +18,7 @@ Download and install Terraform following HashiCorp's instructions: [Install Pack
 ```
 
 
-## Before starting, make sure the S3 bucket and DynamoDB table already exist or create them using AWS Management Console or Terraform !!!
+### Before starting, make sure the S3 bucket and DynamoDB table already exist or create them using AWS Management Console or Terraform !!!
 
 ### Go to the directory with your configuration files:
 
@@ -48,7 +48,7 @@ terraform apply
 
 ## After deployment:
 
-### Check the output: After successfully running terraform apply, you will see the output variables you configured in outputs.tf, including the IP addresses and DNS names of your resources.
+Check the output: After successfully running terraform apply, you will see the output variables you configured in outputs.tf, including the IP addresses and DNS names of your resources.
 
-### Monitor resources: Go to the AWS Management Console to ensure that all resources are created correctly.
+Monitor resources: Go to the AWS Management Console to ensure that all resources are created correctly.
 
