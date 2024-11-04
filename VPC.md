@@ -59,7 +59,22 @@ aws ec2 run-instances --image-id ami-0084a47cc718c111a --count 1 --instance-type
 
 ## Setting up SSH via web server to access the database:
 
+To do this, to allow access to your database server via SSH from a regular bastion host, you need to make changes to your ~/.ssh/config configuration file:
 
 ```
-ssh -J ubuntu@192.168.0.125 ubuntu@192.168.0.168
+Host bastion
+    HostName 192.168.0.125
+    User ubuntu
+    IdentityFile ~/.ssh/private_key.pem
+
+Host db-server
+    HostName 192.168.0.168
+    User ubuntu
+    IdentityFile ~/.ssh/private_key.pem
+    ProxyJump bastion
+```
+## The command for connecting to db-server via bastion will look like this:
+
+```
+ssh db-server
 ```
