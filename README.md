@@ -1,33 +1,54 @@
-# Home Work 5
+# Home Work 6
 
-# Create AMI Image for Application with Packer
+# Basic project on Terraform, AWS VPC with Terraform
 
 ## Dependence:
-### Download and install Packer following HashiCorp's instructions: (https://developer.hashicorp.com/packer/install)
-### Moving packer files to working directory
 
-## To Bild:
+Download and install Terraform following HashiCorp's instructions: [Install Packer](https://developer.hashicorp.com/terraform/install)
 
-```
-packer build -var-file=variables.pkrvars.hcl app.pkr.hcl
-packer build -var-file=variables.pkrvars.hcl db.pkr.hcl
-```
-
-
-## Tasks with an asterisk
-
-### Move the file: "app.service" to the directory: /etc/systemd/system/ 
-## Start the service:
+### Creating a file structure in the terraform working directory:
 
 ```
-sudo systemctl daemon-reload
-sudo systemctl enable app.service
-sudo systemctl start app.service
+* provider.tf: AWS provider settings.
+* backend.tf: Settings for remote backend.
+* main.tf: Description of VPCs, subnets and EC2 instances.
+* sg.tf: Description of Security Groups.
+* variables.tf: Definition of input variables.
+* outputs.tf: Description of output variables.
 ```
-## Move the database backup script to the required directory: /usr/local/bin/backup_db.sh
 
-## Setting up cron to run the script
+
+## Before starting, make sure the S3 bucket and DynamoDB table already exist or create them using AWS Management Console or Terraform !!!
+
+### Go to the directory with your configuration files:
+
+### Initialize Terraform:
 
 ```
-(crontab -l ; echo "0 1 * * * /usr/local/bin/backup_db.sh") | crontab -
+terraform init
 ```
+
+### Check your configuration:
+
+```
+terraform validate
+```
+
+### View the deployment plan:
+
+```
+terraform plan
+```
+
+### Apply changes:
+
+```
+terraform apply
+```
+
+## After deployment:
+
+### Check the output: After successfully running terraform apply, you will see the output variables you configured in outputs.tf, including the IP addresses and DNS names of your resources.
+
+### Monitor resources: Go to the AWS Management Console to ensure that all resources are created correctly.
+
