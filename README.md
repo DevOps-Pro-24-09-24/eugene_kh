@@ -1,2 +1,2 @@
-# Eugene Kholodniak
+# Eugene Kh
 ## homeworks
