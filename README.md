@@ -21,7 +21,6 @@ To create an infrastructure with a public WordPress site and an RDS database wit
 terraform_project/
 ├── main.tf
 ├── variables.tf
-├── outputs.tf
 ├── wordpress_user_data.sh
 ├── modules/
 │   ├── vpc/
