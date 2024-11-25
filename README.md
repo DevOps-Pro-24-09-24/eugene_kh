@@ -1,6 +1,6 @@
 # Home Work 7
 
-# Raising an AWS site with an RDS database
+# Raising a website on an AWS resource with an RDS database
 
 To create an infrastructure with a public WordPress site and an RDS database with HTTPS access in AWS using Terraform, we will divide the configuration into several modules.
 
