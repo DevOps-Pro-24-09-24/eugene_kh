@@ -41,7 +41,7 @@ terraform_project/
 * wordpress_user_data.sh
 
 ### Obtaining an SSL Certificate (ARN for HTTPS):
-In order for your site to use HTTPS, you need to obtain an SSL certificate using AWS Certificate Manager (ACM).
+In order for your site to use HTTPS, you need to obtain an SSL certificate using [AWS Certificate Manager (ACM)](https://console.aws.amazon.com/acm-pca/home?Instances).
 
 ### Go to the directory with your configuration files:
 
