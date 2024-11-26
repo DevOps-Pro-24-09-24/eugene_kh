@@ -30,7 +30,7 @@ terraform_project/
 ├── terraform.tfvars
 ```
 
-### We create modules:
+### Create modules:
 
 * Creating a VPC module: modules/vpc/main.tf + variables.tf
 * Creating an EC2 module: modules/ec2/main.tf + variables.tf
