@@ -1,0 +1,29 @@
+---
+- name: Install and configure MySQL
+  hosts: all
+  become: true
+  tasks:
+    - name: Install MySQL
+      apt:
+        name: mysql-server
+        state: present
+    - name: Install Python MySQL module
+      apt:
+        name: python3-pymysql
+        state: present
+    - name: Configure MySQL to listen on all IPs
+      blockinfile:
+        path: /etc/mysql/my.cnf
+        block: |
+          [mysqld]
+          bind-address = 0.0.0.0
+    - name: Create MySQL database
+      mysql_db:
+        name: "{{ mysql_db }}"
+        state: present
+    - name: Create MySQL user
+      mysql_user:
+        name: "{{ mysql_user }}"
+        password: "{{ mysql_pass }}"
+        priv: "{{ mysql_db }}.*:ALL"
+        state: present

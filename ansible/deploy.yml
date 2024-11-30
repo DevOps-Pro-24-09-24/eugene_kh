@@ -1,0 +1,33 @@
+---
+- name: Deploy Flask app
+  hosts: all
+  become: true
+  tasks:
+    - name: Clone Flask app from GitHub
+      git:
+        repo: 'https://github.com/your-repo/flask-app.git'
+        dest: /home/ubuntu/flask-app
+    - name: Install requirements with pip
+      pip:
+        requirements: /home/ubuntu/flask-app/requirements.txt
+    - name: Create systemd service for Flask app
+      copy:
+        dest: /etc/systemd/system/flask-app.service
+        content: |
+          [Unit]
+          Description=Flask App
+          After=network.target
+
+          [Service]
+          User=ubuntu
+          WorkingDirectory=/home/ubuntu/flask-app
+          ExecStart=/usr/bin/python3 /home/ubuntu/flask-app/app.py
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+    - name: Start and enable Flask app service
+      systemd:
+        name: flask-app
+        state: started
+        enabled: yes
