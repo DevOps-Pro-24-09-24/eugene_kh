@@ -1,0 +1,20 @@
+- name: Install required packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - nginx
+    - git
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Start and enable nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Deploy web application
+  copy:
+    src: /path/to/your/app
+    dest: /var/www/html/

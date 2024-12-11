@@ -1,74 +1,69 @@
-# Home Work 8
+# Home Work 9
 
-# Using Ansible Playbooks
+# Ansible roles
 
-## Dependence:
-Download and install Packer following HashiCorp's instructions: [Install Packer](https://developer.hashicorp.com/packer/install)
+## Infrastructure preparation:
 
-### How does this work:
+## Two servers:
+
+* One for the web application.
+* The second one is for the database.
+* Ansible control node: Install Ansible on the control machine.
+* Connecting via SSH: Make sure Ansible has access to the servers.
 
 ### Creating a Project Directory:
 
 ```
 project/
-├── packer/
-│   ├── app-template.json
-│   ├── db-template.json
-│   └── variables.json
-├── ansible/
-│   ├── ansible.cfg
-│   ├── app_install.yml
-│   ├── db_install.yml
-│   └── deploy.yml
-└── README.md
+├── ansible.cfg
+├── inventory/
+│   ├── hosts
+├── playbook.yml
+├── roles/
+│   ├── app/
+│   │   ├── tasks/
+│   │   │   └── main.yml
+│   │   ├── templates/
+│   │   └── vars/
+│   │       └── main.yml
+│   ├── db/
+│       ├── tasks/
+│       │   └── main.yml
+│       ├── templates/
+│       └── vars/
+│           └── main.yml
 ```
 
-### Creating playbooks:
+### Creating Inventory
+Create an "inventory/hosts" file to describe your servers
 
-* app_install.yml - to install the necessary system packages for the application. This playbook will install Python and the necessary libraries for Flask.
-* db_install.yml - for installing MySQL, creating a database and user. This playbook installs MySQL, configures it to listen on all IP addresses, and creates a database and user.
-* variables.yaml - specifies parameters for MySQL.
-* deploy.yml - for getting application code, installing dependencies, creating a service and launching it.
+### Setting up "ansible.cfg"
+Add basic configuration
 
-### Packer templates update:
+### Creating Roles
+Role for web application (roles/app) tasks/main.yml: Describe installing the necessary packages and deploying the application.
++ vars/main.yml: Set variables for RHEL and Debian.
 
-* We update the Packer template for the application: "app-template.json" to use Ansible as a provisioner.
-* We update the Packer template for the database: "db-template.json".
+### Database role (roles/db)
+tasks/main.yml: Install and configure the database.
++ vars/main.yml: Specify differences between RHEL and Debian.
 
-### Using Packer to Create an AMI:
-Once you have updated the Packer templates and playbooks, you can create an AMI for the application and database using the command:
+### Creating a Playbook
+Create a playbook.yml file
 
-```
-packer build -var-file=variables.json app-template.json
-packer build -var-file=variables.json db-template.json
-```
-
-### Application deployment:
-Once the AMI images are created, you can deploy EC2 instances from the created images, to deploy the application, use: "deploy.yml":
+### Playbook launch
+Check the connection:
 
 ```
-ansible-playbook -i inventory deploy.yml
+ansible all -m ping
 ```
 
-### Security Groups:
-Don't forget to configure security groups on [EC2 instances page](https://console.aws.amazon.com/ec2/v2/home#Instances):
-
-* For the application - access to port 8000.
-* For the database - access to MySQL from the internal IP address of the application.
-
-### Checking application availability:
-Once the application is deployed, check its availability at the URL:
+### Run the playbook:
 
 ```
-http://<app_instance_dns_or_ip>:8000
+ansible-playbook playbook.yml
 ```
 
-### Troubleshooting:
-Error if application is missing: If the application is not configured or running, the error will be:
-
-* 404 Not Found - if routes are not configured for certain paths.
-* 502 Bad Gateway - If the correct handler is not configured for port 8000, or if the application is not listening on this port.
-
-You will succeed
-
-Don't steal your homework :)!
+## Testing
+* Check that the web application is accessible over the web server IP.
+* Make sure the database is configured and the connection to the web application is established.

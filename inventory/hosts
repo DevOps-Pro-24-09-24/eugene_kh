@@ -1,0 +1,5 @@
+[web]
+webserver ansible_host=172.31.42.93 ansible_user=ubuntu
+
+[db]
+dbserver ansible_host=172.37.51.54 ansible_user=ubuntu
