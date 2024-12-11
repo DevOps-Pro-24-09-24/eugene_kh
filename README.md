@@ -7,3 +7,4 @@
 ### HW-6. [Basic project on Terraform, AWS VPC with Terraform](https://github.com/DevOps-Pro-24-09-24/eugene_kholodniak/tree/hw-6)
 ### HW-7. [Raising a website on an AWS resource with an RDS database](https://github.com/DevOps-Pro-24-09-24/eugene_kholodniak/tree/hw-7)
 ### HW-8. [Using Ansible Playbooks](https://github.com/DevOps-Pro-24-09-24/eugene_kholodniak/tree/hw-8)
+### HW-9. [Ansible roles](https://github.com/DevOps-Pro-24-09-24/eugene_kh/tree/hw-9)
