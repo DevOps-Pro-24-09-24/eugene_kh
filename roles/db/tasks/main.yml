@@ -13,10 +13,14 @@
   mysql_db:
     name: myapp_db
     state: present
+    login_user: root
+    login_password: "{{ root_db_password }}"
 
 - name: Create database user
   mysql_user:
     name: myapp_user
-    password: myapp_password
+    password: "{{ db_user_password }}"
     priv: "myapp_db.*:ALL"
     state: present
+    login_user: root
+    login_password: "{{ root_db_password }}"

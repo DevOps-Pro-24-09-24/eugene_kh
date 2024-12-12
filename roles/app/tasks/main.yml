@@ -3,18 +3,11 @@
     name: "{{ item }}"
     state: present
   loop:
-    - nginx
-    - git
-  when: ansible_facts['os_family'] == 'Debian'
+    - "{{ web_packages }}"
+  when: ansible_facts['os_family'] == 'Debian' or ansible_facts['os_family'] == 'RedHat'
 
-- name: Start and enable nginx
+- name: Start and enable web server
   service:
-    name: nginx
+    name: "{{ web_service }}"
     state: started
     enabled: yes
-  when: ansible_facts['os_family'] == 'Debian'
-
-- name: Deploy web application
-  copy:
-    src: /path/to/your/app
-    dest: /var/www/html/

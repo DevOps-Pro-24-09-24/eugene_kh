@@ -1,1 +1,2 @@
-nginx_package: "{{ 'nginx' if ansible_facts['os_family'] == 'Debian' else 'httpd' }}"
+web_packages: "{{ 'nginx' if ansible_facts['os_family'] == 'Debian' else 'httpd' }}"
+web_service: "{{ 'nginx' if ansible_facts['os_family'] == 'Debian' else 'httpd' }}"
