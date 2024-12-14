@@ -1,4 +1,0 @@
-db_package: "{{ 'mariadb-server' if ansible_facts['os_family'] == 'Debian' else 'mysql-server' }}"
-db_service: "{{ 'mysql' if ansible_facts['os_family'] == 'Debian' else 'mysqld' }}"
-root_db_password: root_password
-db_user_password: user_password

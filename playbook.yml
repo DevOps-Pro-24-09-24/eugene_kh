@@ -1,9 +1,0 @@
-- name: Configure Web Server
-  hosts: web
-  roles:
-    - app
-
-- name: Configure Database Server
-  hosts: db
-  roles:
-    - db
