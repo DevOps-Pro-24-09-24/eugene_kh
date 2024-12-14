@@ -1,69 +1,41 @@
-# Home Work 9
+# Home Work 10
 
-# Ansible roles
+# Docker-1
 
-## Infrastructure preparation:
-
-## Two servers:
-
-* One for the web application.
-* The second one is for the database.
-* Ansible control node: Install Ansible on the control machine.
-* Connecting via SSH: Make sure Ansible has access to the servers.
+## Dependence:
+Download and install Docker following instructions: [Install Docker](https://docs.docker.com/engine/install/)
 
 ### Creating a Project Directory:
 
 ```
 project/
-├── ansible.cfg
-├── inventory/
-│   ├── hosts
-├── playbook.yml
-├── roles/
-│   ├── app/
-│   │   ├── tasks/
-│   │   │   └── main.yml
-│   │   ├── templates/
-│   │   └── vars/
-│   │       └── main.yml
-│   ├── db/
-│       ├── tasks/
-│       │   └── main.yml
-│       ├── templates/
-│       └── vars/
-│           └── main.yml
+├── app/
+│   ├── app.py
+│   ├── requirements.txt
+├── Dockerfile
+├── compose.yaml
+└── .env         
 ```
 
-### Creating Inventory
-Create an "inventory/hosts" file to describe your servers
+### How does this work:
 
-### Setting up "ansible.cfg"
-Add basic configuration
+* Writing a web application - In this HW we will create a Flask application. It will connect to the database and output data: "app/app.py".
+* We create a list of dependencies: "app/requirements.txt".
+* Creating a Dockerfile - The Dockerfile describes how the Docker image for our application will be built.
+* Create compose.yaml - The Compose file manages several containers: an application and a database.
+* Create a .env file - File for storing environment variables.
 
-### Creating Roles
-Role for web application (roles/app) tasks/main.yml: Describe installing the necessary packages and deploying the application.
-+ vars/main.yml: Set variables for RHEL and Debian.
+### Let's launch the project:
 
-### Database role (roles/db)
-tasks/main.yml: Install and configure the database.
-+ vars/main.yml: Specify differences between RHEL and Debian.
-
-### Creating a Playbook
-Create a playbook.yml file
-
-### Playbook launch
-Check the connection:
-
+* We build Docker images and launch containers:
 ```
-ansible all -m ping
+docker-compose up --build
 ```
 
-### Run the playbook:
+* Check if the application is running:
 
 ```
-ansible-playbook playbook.yml
+http://localhost:5000
 ```
 
-## Testing
-* Check that the web application is accessible over the web server IP.
-* Make sure the database is configured and the connection to the web application is established.
+
