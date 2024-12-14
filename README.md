@@ -8,3 +8,4 @@
 ### HW-7. [Raising a website on an AWS resource with an RDS database](https://github.com/DevOps-Pro-24-09-24/eugene_kholodniak/tree/hw-7)
 ### HW-8. [Using Ansible Playbooks](https://github.com/DevOps-Pro-24-09-24/eugene_kholodniak/tree/hw-8)
 ### HW-9. [Ansible roles](https://github.com/DevOps-Pro-24-09-24/eugene_kh/tree/hw-9)
+### HW-10. [Docker-1](https://github.com/DevOps-Pro-24-09-24/eugene_kh/tree/hw-10)
