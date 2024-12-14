@@ -3,7 +3,7 @@
 # Docker-1
 
 ## Dependence:
-Download and install Docker following instructions: [Install Docker](https://docs.docker.com/engine/install/)
+Download and install Docker following instructions: [Install Docker](https://docs.docker.com/engine/install/) + [Install Docker Compose](https://docs.docker.com/compose/install/linux/)
 
 ### Creating a Project Directory:
 
