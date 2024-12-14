@@ -1,25 +1,17 @@
 version: "3.9"
 services:
   app:
-    build:
-      context: .
-    ports:
-      - "5000:5000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=testdb
-    depends_on:
-      - db
-
+    image: ekh7/hw-11
+    networks:
+      macvlan_net:
+        ipv4_address: 192.168.67.201
   db:
     image: mysql:8.0
+    networks:
+      - macvlan_net
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: testdb
-    volumes:
-      - db_data:/var/lib/mysql
-
-volumes:
-  db_data:
+networks:
+  macvlan_net:
+    external: true

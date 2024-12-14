@@ -1,69 +1,169 @@
-# Home Work 9
+# Home Work 11
 
-# Ansible roles
+# Docker-2
 
-## Infrastructure preparation:
-
-## Two servers:
-
-* One for the web application.
-* The second one is for the database.
-* Ansible control node: Install Ansible on the control machine.
-* Connecting via SSH: Make sure Ansible has access to the servers.
+## Dependence:
+Download and install Docker following instructions: [Install Docker](https://docs.docker.com/engine/install/) + [Install Docker Compose](https://docs.docker.com/compose/install/linux/)
 
 ### Creating a Project Directory:
 
 ```
 project/
-├── ansible.cfg
-├── inventory/
-│   ├── hosts
-├── playbook.yml
-├── roles/
-│   ├── app/
-│   │   ├── tasks/
-│   │   │   └── main.yml
-│   │   ├── templates/
-│   │   └── vars/
-│   │       └── main.yml
-│   ├── db/
-│       ├── tasks/
-│       │   └── main.yml
-│       ├── templates/
-│       └── vars/
-│           └── main.yml
+├── app/
+│   ├── app.py
+│   ├── requirements.txt
+├── Dockerfile
+├── compose.yaml
+├── .env
+├── nginx.conf
+├── certs/
+│   ├── server.key
+│   ├── server.crt
 ```
 
-### Creating Inventory
-Create an "inventory/hosts" file to describe your servers
+### Preparing and uploading a Docker image to Docker Hub:
 
-### Setting up "ansible.cfg"
-Add basic configuration
+### Login to Docker Hub:
 
-### Creating Roles
-Role for web application (roles/app) tasks/main.yml: Describe installing the necessary packages and deploying the application.
-+ vars/main.yml: Set variables for RHEL and Debian.
-
-### Database role (roles/db)
-tasks/main.yml: Install and configure the database.
-+ vars/main.yml: Specify differences between RHEL and Debian.
-
-### Creating a Playbook
-Create a playbook.yml file
-
-### Playbook launch
-Check the connection:
-
+* Make sure you have a Docker Hub account. If not, [register] (https://app.docker.com/signup).
+* Login to Docker via terminal:
 ```
-ansible all -m ping
+docker login
 ```
-
-### Run the playbook:
-
+* Tagging the Docker image:
 ```
-ansible-playbook playbook.yml
+docker tag web-app ekh7/hw-11
 ```
+* Uploading the image to Docker Hub:
+```
+docker push ekh7/hw-11
+```
+### Using an image from Docker Hub:
+In compose.yaml we will change the app section to use the image from Docker Hub:
+```
+version: "3.9"
+services:
+  app:
+    image: ekh7/hw-11
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=testdb
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: testdb
+    volumes:
+      - db_data:/var/lib/mysql
+volumes:
+  db_data:
+```
+Run docker-compose:
+```
+docker-compose up
+```
+### Setting up HTTPS via NGINX reverse proxy:
+Add NGINX as a reverse proxy to work with HTTPS in compose.yaml:
+```
+version: "3.9"
+services:
+  app:
+    image: ekh7/hw-11
+    expose:
+      - "5000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=testdb
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: testdb
+    volumes:
+      - db_data:/var/lib/mysql
+  nginx:
+    image: nginx:latest
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+volumes:
+  db_data:
+```
+### Create the nginx.conf file:
+```
+server {
+    listen 443 ssl;
+    server_name localhost;
 
-## Testing
-* Check that the web application is accessible over the web server IP.
-* Make sure the database is configured and the connection to the web application is established.
+    ssl_certificate /etc/nginx/certs/server.crt;
+    ssl_certificate_key /etc/nginx/certs/server.key;
+
+    location / {
+        proxy_pass http://app:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+### Create a self-signed certificate for testing:
+```
+mkdir certs
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout certs/server.key -out certs/server.crt \
+    -subj "/CN=localhost"
+```
+Run docker-compose:
+```
+docker-compose up --build
+```
+### Configuring macvlan or ipvlan for an IP address in the host subnet:
+
+Creating a macvlan network:
+```
+docker network create -d macvlan \
+  --subnet=192.168.67.0/24 \
+  --gateway=192.168.67.1 \
+  -o parent=eth0 macvlan_net
+```
+### Update compose.yaml - Add a macvlan network to the application:
+```
+version: "3.9"
+services:
+  app:
+    image: ekh7/hw-11
+    networks:
+      macvlan_net:
+        ipv4_address: 192.168.67.101
+  db:
+    image: mysql:8.0
+    networks:
+      - macvlan_net
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: testdb
+networks:
+  macvlan_net:
+    external: true
+```
+### Testing:
+
+Start all containers:
+```
+docker-compose up
+```
+Check:
+
+* The application is available via HTTPS at https://192.168.67.101.
+* The database uses a macvlan network.
