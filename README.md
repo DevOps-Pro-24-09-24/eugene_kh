@@ -45,52 +45,20 @@ version: "3.9"
 services:
   app:
     image: ekh7/hw-11
-    ports:
-      - "5000:5000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=testdb
+    networks:
+      macvlan_net:
+        ipv4_address: 192.168.67.201
     depends_on:
       - db
+
   db:
     image: mysql:8.0
+    networks:
+      - macvlan_net
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: testdb
-    volumes:
-      - db_data:/var/lib/mysql
-volumes:
-  db_data:
-```
-Run docker-compose:
-```
-docker-compose up
-```
-### Setting up HTTPS via NGINX reverse proxy:
-Add NGINX as a reverse proxy to work with HTTPS in compose.yaml:
-```
-version: "3.9"
-services:
-  app:
-    image: ekh7/hw-11
-    expose:
-      - "5000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=testdb
-    depends_on:
-      - db
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: testdb
-    volumes:
-      - db_data:/var/lib/mysql
+
   nginx:
     image: nginx:latest
     ports:
@@ -98,9 +66,21 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./certs:/etc/nginx/certs:ro
-volumes:
-  db_data:
+    depends_on:
+      - app
+    networks:
+      macvlan_net:
+        ipv4_address: 192.168.67.202
+
+networks:
+  macvlan_net:
+    external: true
 ```
+Run docker-compose:
+```
+docker-compose up
+```
+
 ### Create the nginx.conf file:
 ```
 server {
@@ -136,26 +116,6 @@ docker network create -d macvlan \
   --subnet=192.168.67.0/24 \
   --gateway=192.168.67.1 \
   -o parent=eth0 macvlan_net
-```
-### Update compose.yaml - Add a macvlan network to the application:
-```
-version: "3.9"
-services:
-  app:
-    image: ekh7/hw-11
-    networks:
-      macvlan_net:
-        ipv4_address: 192.168.67.101
-  db:
-    image: mysql:8.0
-    networks:
-      - macvlan_net
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: testdb
-networks:
-  macvlan_net:
-    external: true
 ```
 ### Testing:
 
