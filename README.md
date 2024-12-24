@@ -10,3 +10,4 @@
 ### HW-9. [Ansible roles](https://github.com/DevOps-Pro-24-09-24/eugene_kh/tree/hw-9)
 ### HW-10. [Docker-1](https://github.com/DevOps-Pro-24-09-24/eugene_kh/tree/hw-10)
 ### HW-11. [Docker-2](https://github.com/DevOps-Pro-24-09-24/eugene_kh/tree/hw-11)
+### HW-12. [Jenkins](https://github.com/DevOps-Pro-24-09-24/eugene_kh/tree/hw-12)
