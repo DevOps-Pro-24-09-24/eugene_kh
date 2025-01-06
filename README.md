@@ -1,169 +1,182 @@
-# Home Work 11
+# Home Work 13
 
-# Docker-2
+# K8S-1
 
 ## Dependence:
-Download and install Docker following instructions: [Install Docker](https://docs.docker.com/engine/install/) + [Install Docker Compose](https://docs.docker.com/compose/install/linux/)
+Download and install Minikube following instructions: [Install Minikube](https://kubernetes.io/ru/docs/tasks/tools/install-minikube/)
 
 ### Creating a Project Directory:
 
 ```
-project/
-├── app/
-│   ├── app.py
-│   ├── requirements.txt
-├── Dockerfile
-├── compose.yaml
-├── .env
-├── nginx.conf
-├── certs/
-│   ├── server.key
-│   ├── server.crt
+k8s-webapp-project/
+├── app/                           
+│   ├── Dockerfile                 
+│   ├── requirements.txt           
+│   ├── app.py                                
+├── manifests/                     
+│   ├── namespace.yaml            
+│   ├── flask-app-service.yaml    
+│   ├── mysql-deployment.yaml  
+│   ├── ingress.yaml              
+|   ├── mysql-service.yaml
+├── README.md                      
 ```
 
-### Preparing and uploading a Docker image to Docker Hub:
+### Preparing the application:
+Flask + PostgreSQL
+* Flask will be responsible for the API and simple frontend.
+* PostgreSQL for data storage.
 
-### Login to Docker Hub:
+### Creating Docker images:
 
-* Make sure you have a Docker Hub account. If not, [register] (https://app.docker.com/signup).
-* Login to Docker via terminal:
 ```
-docker login
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["python", "app.py"]
 ```
-* Tagging the Docker image:
-```
-docker tag web-app ekh7/hw-11
-```
-* Uploading the image to Docker Hub:
-```
-docker push ekh7/hw-11
-```
-### Using an image from Docker Hub:
-In compose.yaml we will change the app section to use the image from Docker Hub:
-```
-version: "3.9"
-services:
-  app:
-    image: ekh7/hw-11
-    ports:
-      - "5000:5000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=testdb
-    depends_on:
-      - db
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: testdb
-    volumes:
-      - db_data:/var/lib/mysql
-volumes:
-  db_data:
-```
-Run docker-compose:
-```
-docker-compose up
-```
-### Setting up HTTPS via NGINX reverse proxy:
-Add NGINX as a reverse proxy to work with HTTPS in compose.yaml:
-```
-version: "3.9"
-services:
-  app:
-    image: ekh7/hw-11
-    expose:
-      - "5000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=testdb
-    depends_on:
-      - db
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: testdb
-    volumes:
-      - db_data:/var/lib/mysql
-  nginx:
-    image: nginx:latest
-    ports:
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certs:/etc/nginx/certs:ro
-volumes:
-  db_data:
-```
-### Create the nginx.conf file:
-```
-server {
-    listen 443 ssl;
-    server_name localhost;
 
-    ssl_certificate /etc/nginx/certs/server.crt;
-    ssl_certificate_key /etc/nginx/certs/server.key;
+### For the database, you can use a ready-made image:
 
-    location / {
-        proxy_pass http://app:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
 ```
-### Create a self-signed certificate for testing:
+PostgreSQL: postgres:latest
 ```
-mkdir certs
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout certs/server.key -out certs/server.crt \
-    -subj "/CN=localhost"
-```
-Run docker-compose:
-```
-docker-compose up --build
-```
-### Configuring macvlan or ipvlan for an IP address in the host subnet:
 
-Creating a macvlan network:
-```
-docker network create -d macvlan \
-  --subnet=192.168.67.0/24 \
-  --gateway=192.168.67.1 \
-  -o parent=eth0 macvlan_net
-```
-### Update compose.yaml - Add a macvlan network to the application:
-```
-version: "3.9"
-services:
-  app:
-    image: ekh7/hw-11
-    networks:
-      macvlan_net:
-        ipv4_address: 192.168.67.101
-  db:
-    image: mysql:8.0
-    networks:
-      - macvlan_net
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: testdb
-networks:
-  macvlan_net:
-    external: true
-```
-### Testing:
+### Build and upload images:
 
-Start all containers:
 ```
-docker-compose up
+docker build -t <your-dockerhub-username>/flask-app .
+docker push <your-dockerhub-username>/flask-app
 ```
-Check:
 
-* The application is available via HTTPS at https://192.168.67.101.
-* The database uses a macvlan network.
+### Creating YAML Manifests:
+
+* flask-app-deployment.yaml:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-app
+  template:
+    metadata:
+      labels:
+        app: flask-app
+    spec:
+      containers:
+        - name: flask-app
+          image: ekh7/flask-app
+          ports:
+            - containerPort: 5000
+```
+
+* mysql-deployment.yaml:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "rootpassword"
+          ports:
+            - containerPort: 3306
+```
+
+* flask-app-service.yaml:
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app
+spec:
+  selector:
+    app: flask-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer
+```
+
+* mysql-service.yaml:
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP
+```
+
+* ingress.yaml:
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: "192.168.49.2.nip.io"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: flask-app
+            port:
+              number: 80
+```
+
+### Using manifestos:
+
+```
+kubectl apply -f namespace.yaml
+kubectl apply -f backend.yaml
+kubectl apply -f database.yaml
+kubectl apply -f ingress.yaml
+```
+
+### Make sure everything is running:
+
+```
+kubectl get all -n webapp
+```
+
+### Checking work:
+
+* Minikube: Use the minikube tunnel command to access the Ingress.
+* Open the application in a browser via the specified domain or IP.
